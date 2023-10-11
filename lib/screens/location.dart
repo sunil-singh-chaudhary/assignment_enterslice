@@ -1,14 +1,7 @@
 import 'package:assignment_enterslice/controller/LocationController.dart';
 import 'package:assignment_enterslice/controller/NativeCommunicationController.dart';
-import 'package:assignment_enterslice/controller/locationpermission.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-
-final eventChannel = const EventChannel('EVENT_CHANNEL_SUB');
-
-final COLUMN_LATITUDE = "latitude";
-final COLUMN_LONGITUDE = "longitude";
 
 class LocatioinScreen extends StatefulWidget {
   const LocatioinScreen({super.key});
@@ -21,13 +14,7 @@ class _LocatioinScreenState extends State<LocatioinScreen> {
   @override
   void initState() {
     super.initState();
-    // NativeCommunicationController.to
-    //     .fetchUpdatedLocation((latitude, longitude) {
-    //   debugPrint('getting lat long in init $latitude - $longitude');
-    //   LocationController.to.latitude.value = latitude;
-    //   LocationController.to.longitude.value = longitude;
-    // });
-    eventHandles();
+    fetchForEvery2Seconds();
   }
 
   @override
@@ -36,8 +23,9 @@ class _LocatioinScreenState extends State<LocatioinScreen> {
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           ElevatedButton(
-            onPressed: () {
-              checkLocationPermissionAndStartService();
+            onPressed: () async {
+              debugPrint('starting locationfetching click in flutter');
+              await NativeCommunicationController.to.startLocationService();
             },
             child: const Text('Start Location Fetching'),
           ),
@@ -58,13 +46,10 @@ class _LocatioinScreenState extends State<LocatioinScreen> {
     );
   }
 
-  void eventHandles() {
-    eventChannel.receiveBroadcastStream().listen((location) {
-      double latitude = location[COLUMN_LATITUDE];
-      double longitude = location[COLUMN_LONGITUDE];
-
-      debugPrint('Updated latitude Flutter getting: $latitude');
-      debugPrint('listening Updated longitude: $longitude');
+  void fetchForEvery2Seconds() {
+    NativeCommunicationController.to
+        .fetchUpdatedLocation((latitude, longitude) {
+      debugPrint('getting lat long in init $latitude - $longitude');
       LocationController.to.latitude.value = latitude;
       LocationController.to.longitude.value = longitude;
     });

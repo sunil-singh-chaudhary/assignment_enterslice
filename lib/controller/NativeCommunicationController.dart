@@ -64,7 +64,7 @@ class NativeCommunicationController extends GetxController {
       double latitude = location[COLUMN_LATITUDE];
       double longitude = location[COLUMN_LONGITUDE];
 
-      debugPrint('Updated latitude Flutter getting: $latitude');
+      debugPrint('listening Updated latitude: $latitude');
       debugPrint('listening Updated longitude: $longitude');
 
       onsuccesscallback(latitude, longitude);
