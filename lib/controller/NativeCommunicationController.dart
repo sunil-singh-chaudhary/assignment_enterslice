@@ -1,4 +1,3 @@
-import 'package:assignment_enterslice/controller/LocationController.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -16,6 +15,7 @@ class NativeCommunicationController extends GetxController {
   final COLUMN_LONGITUDE = "longitude";
   final COLUMN_TIMESTAMP = "timestamp";
   final platform = const MethodChannel('location_service');
+  final eventChannel = const EventChannel('EVENT_CHANNEL_SUB');
 
   Future<void> startLocationService() async {
     debugPrint('Start click');
@@ -58,26 +58,16 @@ class NativeCommunicationController extends GetxController {
     }
   }
 
-  void fetchUpdatedLocation() async {
-    try {
-      final result = await platform.invokeMethod('updateLocation');
+  void fetchUpdatedLocation(
+      Function(double latitude, double longitude) onsuccesscallback) async {
+    eventChannel.receiveBroadcastStream().listen((location) {
+      double latitude = location[COLUMN_LATITUDE];
+      double longitude = location[COLUMN_LONGITUDE];
 
-      if (result != null) {
-        final Map<dynamic, dynamic> data = result;
-        final double lat = data[COLUMN_LATITUDE];
-        final double long = data[COLUMN_LONGITUDE];
+      debugPrint('Updated latitude Flutter getting: $latitude');
+      debugPrint('listening Updated longitude: $longitude');
 
-        // Use the LocationController to update the values
-        LocationController.to.updateLocation(lat, long);
-
-        // Handle the result if needed
-        debugPrint('Received Updated data from Android: $result');
-      } else {
-        debugPrint('No Updated data received from Android.');
-      }
-    } catch (e) {
-      // Handle any errors
-      debugPrint('Error fetching Updated_data from Android: $e');
-    }
+      onsuccesscallback(latitude, longitude);
+    });
   }
 }

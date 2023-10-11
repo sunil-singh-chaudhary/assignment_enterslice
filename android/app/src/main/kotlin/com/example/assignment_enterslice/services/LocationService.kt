@@ -18,11 +18,9 @@ import com.google.android.gms.location.*
 import org.greenrobot.eventbus.EventBus
 
 class LocationService : Service() {
-
-
     companion object {
         const val CHANNEL_ID = "12345"
-        const val NOTIFICATION_ID=12345
+        const val NOTIFICATION_ID=123457
     }
     private var fusedLocationProviderClient: FusedLocationProviderClient? = null
     private var locationCallback: LocationCallback? = null

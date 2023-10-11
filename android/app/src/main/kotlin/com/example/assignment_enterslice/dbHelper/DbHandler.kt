@@ -2,7 +2,7 @@ package com.example.assignment_enterslice.dbHelper
 
 import android.content.Context
 
-class DbContants {
+class DbHandler {
 
     fun fetchDataFromDatabase(context : Context): List<Map<String, Any?>> {
         val dbHelper = LocationDatabaseHelper(context)

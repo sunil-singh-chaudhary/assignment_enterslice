@@ -2,8 +2,13 @@ import 'package:assignment_enterslice/controller/LocationController.dart';
 import 'package:assignment_enterslice/controller/NativeCommunicationController.dart';
 import 'package:assignment_enterslice/controller/locationpermission.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'dart:async';
+
+final eventChannel = const EventChannel('EVENT_CHANNEL_SUB');
+
+final COLUMN_LATITUDE = "latitude";
+final COLUMN_LONGITUDE = "longitude";
 
 class LocatioinScreen extends StatefulWidget {
   const LocatioinScreen({super.key});
@@ -13,23 +18,16 @@ class LocatioinScreen extends StatefulWidget {
 }
 
 class _LocatioinScreenState extends State<LocatioinScreen> {
-  late Timer _timer;
-
   @override
   void initState() {
     super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
-      debugPrint('requesting from flutter Timer tick');
-      NativeCommunicationController.to.fetchUpdatedLocation();
-    });
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-
-    // Cancel the timer when the widget is disposed
-    _timer.cancel();
+    // NativeCommunicationController.to
+    //     .fetchUpdatedLocation((latitude, longitude) {
+    //   debugPrint('getting lat long in init $latitude - $longitude');
+    //   LocationController.to.latitude.value = latitude;
+    //   LocationController.to.longitude.value = longitude;
+    // });
+    eventHandles();
   }
 
   @override
@@ -58,5 +56,17 @@ class _LocatioinScreenState extends State<LocatioinScreen> {
         ]),
       ),
     );
+  }
+
+  void eventHandles() {
+    eventChannel.receiveBroadcastStream().listen((location) {
+      double latitude = location[COLUMN_LATITUDE];
+      double longitude = location[COLUMN_LONGITUDE];
+
+      debugPrint('Updated latitude Flutter getting: $latitude');
+      debugPrint('listening Updated longitude: $longitude');
+      LocationController.to.latitude.value = latitude;
+      LocationController.to.longitude.value = longitude;
+    });
   }
 }
